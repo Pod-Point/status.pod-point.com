@@ -1,2 +1,3 @@
-# status.pod-point.com
-Pod Point Status Page
+# Pod Point Status
+
+Static website to report on the system status of Pod Point services.
