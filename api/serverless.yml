@@ -1,0 +1,26 @@
+service: status-api
+provider:
+  name: aws
+  defaultStage: staging
+  stage: ${env:STAGE, self:provider.defaultStage, opt:stage}
+  role: ${env:AWS_ROLE, file(./.env.yml):AWS_ROLE}
+  runtime: nodejs6.10
+  region: ${env:APP_AWS_REGION, file(./.env.yml):APP_AWS_REGION}
+  vpc:
+    securityGroupIds:
+      - ${env:APP_VPC_SECURITY_GROUP, file(./.env.yml):APP_VPC_SECURITY_GROUP}
+    subnetIds:
+      - ${env:APP_VPC_SUBNET, file(./.env.yml):APP_VPC_SUBNET}
+  environment:
+    DD_API_KEY: ${env:DD_API_KEY, file(./.env.yml):DD_API_KEY}
+    DD_APP_KEY: ${env:DD_APP_KEY, file(./.env.yml):DD_APP_KEY}
+functions:
+  api:
+    handler: src/api.handler
+    description: API for Pod Point service status data
+    events:
+      - http:
+          path: /
+          method: get
+plugins:
+  - serverless-webpack
