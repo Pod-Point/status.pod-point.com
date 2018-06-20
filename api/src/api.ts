@@ -35,7 +35,6 @@ export async function handler(event: APIGatewayEvent, context: Context, callback
     const responseTime: DataDogSeriesData[] = await datadog.queryMetric('avg:podpoint.api.request.time.median{*} by {availability-zone}');
     const podEvents: DataDogSeriesData[] = await datadog.queryMetric('avg:aws.sns.number_of_messages_published{topicname:pod-unit-event-received}.as_count()');
 
-    const awsStatus: string = await datadog.getMonitor(4359290);
     const uptime: any = await datadog.averageMetric('avg:aws.route53.health_check_percentage_healthy{*} by {name}');
 
     const response: ProxyResult = {
@@ -45,9 +44,6 @@ export async function handler(event: APIGatewayEvent, context: Context, callback
         },
         body: JSON.stringify({
             uptime: filterScopes(uptime),
-            status: {
-                aws: awsStatus,
-            },
             metrics: {
                 responseTime,
                 podEvents,

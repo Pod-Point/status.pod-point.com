@@ -10,7 +10,8 @@
     "pretest": "npm run lint",
     "test": "jest",
     "tsc": "tsc --noEmit --pretty",
-    "deploy": "serverless deploy --stage production"
+    "deploy": "serverless deploy --stage production",
+    "invoke": "serverless invoke local --function api"
   },
   "license": "proprietary",
   "devDependencies": {
