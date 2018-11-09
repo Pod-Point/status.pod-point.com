@@ -1,45 +1,43 @@
 import React, { Component } from 'react'; // eslint-disable-line no-unused-vars
-import './App.css';
+import styled from 'styled-components';
 
-import Availability from './components/availability'; // eslint-disable-line no-unused-vars
-import Response from './components/response'; // eslint-disable-line no-unused-vars
-import Events from './components/events'; // eslint-disable-line no-unused-vars
+import logo from './logo.svg';
+import Availability from './Availability'; // eslint-disable-line no-unused-vars
 
-const containerPage = {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'center',
-};
+const PageContainer = styled.div` 
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+`;
 
-const containerContent = {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '720px',
-    justifyContent: 'center',
-    paddingTop: 64,
-};
+const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 720px;
+  margin-top: 64px;
+`;
 
-const containerSection = {
-    width: '100%',
-    marginTop: 48,
-};
+const H1 = styled.h1`
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #22292F;
+`;
 
-const headingStyle = {
-    fontFamily: 'Quicksand',
-    fontWeight: 700,
-    color: '#22292F',
-};
+const H2 = styled.h2`
+  font-family: 'Quicksand', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #22292F;
+  text-transform: uppercase;
+`;
 
-const h1 = {
-    fontSize: 16,
-};
-
-const h2 = {
-    fontSize: 12,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-};
+const Logo = styled.img`
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+`;
 
 class App extends Component {
     constructor(props) {
@@ -47,6 +45,7 @@ class App extends Component {
         this.state = {
             isLoading: false,
             availability: [],
+            updated: 'Updating...',
         };
     }
 
@@ -59,14 +58,9 @@ class App extends Component {
     async fetchData() {
         const response = await fetch('https://n2hvdpqs9l.execute-api.eu-west-1.amazonaws.com/production');
         const json = await response.json();
-        const status = json.status.aws;
-        const podEvents = this.appendXY(json.metrics.podEvents[0].pointlist);
-        const responseTime1a = this.appendXY(json.metrics.responseTime[0].pointlist);
-        const responseTime1b = this.appendXY(json.metrics.responseTime[1].pointlist);
-        const responseTime1c = this.appendXY(json.metrics.responseTime[2].pointlist);
         const availability = this.processServiceUptime(json.uptime);
         this.setState({
-            isLoading: false, status, podEvents, responseTime1a, responseTime1b, responseTime1c, availability,
+            isLoading: false, availability,
         });
     }
 
@@ -74,91 +68,35 @@ class App extends Component {
         clearInterval(this.refresh);
     }
 
-    appendXY = param => {
-        let data = [];
-        param.forEach(element => {
-            const arr = {
-                x: element[0],
-                y: element[1],
-            };
-            data = [
-                ...data,
-                arr,
-            ];
-        });
-        return data;
-    }
-
-    processServiceUptime = param => {
-        console.log(param);
-        let data = [];
-        param.forEach(service => {
-            const arr = {
-                name: service.scope,
-                uptime: `${Math.round(service.average * 100) / 100}%`,
-            };
-            data = [
-                ...data,
-                arr,
-            ];
-        });
-        return data;
-    }
+  processServiceUptime = param => {
+      let data = [];
+      param.forEach(service => {
+          const arr = {
+              name: service.scope,
+              uptime: `${Math.round(service.average * 100) / 100}`,
+          };
+          data = [
+              ...data,
+              arr,
+          ];
+      });
+      return data;
+  }
 
 
-    render() {
-        return (
-            <div style={containerPage}>
-                <div style={containerContent}>
-
-                    {/* <div style={{
-                        width: 'auto',
-                        paddingTop: 12,
-                        paddingBottom: 12,
-                        paddingLeft: 16,
-                        paddingRight: 16,
-                        background: '#FCEBEA',
-                        border: '1px solid #EF5753',
-                        borderRadius: 4,
-                        overflow: 'hidden'
-                    }}>
-                        <strong style={{
-                            color: '#CC1F1A',
-                            fontSize: 14,
-                            fontWeight: 700,
-                            fontFamily: 'Quicksand'
-                        }}>Holy smokes!
-                        </strong>
-                        <span style={{
-                            color: '#CC1F1A',
-                            fontSize: 14,
-                            fontWeight: 400,
-                            fontFamily: 'Quicksand'
-                        }}> Something seriously bad happened.</span>
-                    </div> */}
-
-
-                    <h1 style={{ ...headingStyle, ...h1 }}>Pod Point Status</h1>
-
-                    <div style={containerSection}>
-                        <h2 style={{ ...headingStyle, ...h2 }}>Availability</h2>
-                        <Availability data={this.state.availability} />
-                    </div>
-
-                    <div style={containerSection}>
-                        <h2 style={{ ...headingStyle, ...h2 }}>API Response</h2>
-                        <Response data1a={this.state.responseTime1a} data1b={this.state.responseTime1b} data1c={this.state.responseTime1c}/>
-                    </div>
-
-                    <div style={containerSection}>
-                        <h2 style={{ ...headingStyle, ...h2 }}>Pod Events</h2>
-                        <Events data={this.state.podEvents} />
-                    </div>
-                    <div style={containerSection} />
-                </div>
-            </div>
-        );
-    }
+  render() {
+      return (
+          <PageContainer>
+              <ContentContainer>
+                  <Logo src={logo} alt="Logo" /><H1>Pod Point Status</H1>
+              </ContentContainer>
+              <ContentContainer>
+                  <H2>Availability</H2>
+                  <Availability data={this.state.availability} />
+              </ContentContainer>
+          </PageContainer>
+      );
+  }
 }
 
 export default App;
