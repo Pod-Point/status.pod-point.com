@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.104",
+    "aws-sdk": "^2.348.0",
     "dogapi": "^2.8.0",
     "lodash": "^4.17.5"
   },
